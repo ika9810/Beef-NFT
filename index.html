@@ -28,6 +28,7 @@
 </head>
 
 <body>
+    <!-- <script src="script.js" defer></script> -->
     <nav class="p-3 container navbar navbar-expand-lg navbar-light">
         <a class="navbar-brand" href="#" onclick="window.location.reload();">AI 소고기 등급 판별기</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +49,7 @@
         </div>
     </nav>
     <section class="section">
-        <h1 class="title">AI 소고기 등급 판별기</h1>
+        <h1 class="title" onclick="test();">AI 소고기 등급 판별기</h1>
         <h2 class="subtitle">소고기 등급을 판별하고 NFT 인증서를 발급받으세요!</h2>
         <h2 class="sr-only">나의 소고기는 몇등급일까? 나의 소고기 등급 찾기를 해보세요!</h2>
         <h3 class="sr-only">수만장의 소고기 사진 데이터로 학습한 인공지능이 카메라를 통해 나의 소고기 등급을 판별하고 판별된 정보를 NFT에 담아 인증서를 발급해줍니다.</h3>
@@ -76,6 +77,8 @@
         <p class="d-flex align-items-center pl-3">남자</p>
     </section>
     <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <!-- axios cdn으로 삽입 && 부트스트랩 body 태그 안에 삽임 -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <div class="mt-3 container file-upload" id="main-container">
         <div class="image-upload-wrap">
@@ -348,11 +351,48 @@
                 labelContainer.childNodes[i].innerHTML = label + bar;
             }
         }
+        async function test1(){
+        const img = $('.file-upload-image').attr('src');
+        const grade = $('.twoplus-meat-title').text();
+        var data = {"grade" : grade,"img": img,}
+        console.log(data);
+        const resp = await fetch("http://54.180.145.244:58282/", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json",
+        // 'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'
+        },
+        body: data
+        })
+        .then((response) => response.json())
+        .then((data) => console.log(data));
+
+        }
+        async function test(){
+            const img = $('.file-upload-image').attr('src');
+            const grade = $('.twoplus-meat-title').text();
+            const data = {"grade" : grade,"img": img}
+            //https://xiubindev.tistory.com/115 참고
+            //const resp = await axios.post('https://cors-anywhere.herokuapp.com/http://54.180.145.244:58282/', data)
+            const resp = await axios.post('http://54.180.145.244:58282/', data)
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        }
     </script>
     <script>
-        function addNFT(){
-        }
-        addNFT();
+                //grade:probabilityList[0].className,
+                //img:$('.file-upload-image').attr('src'),
+
+    </script>
+    <script>
+
+
+
     </script>
     <script>
         function iosApp() {
