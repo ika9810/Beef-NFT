@@ -375,7 +375,7 @@
             const data = {"grade" : grade,"img": img}
             //https://xiubindev.tistory.com/115 참고
             //const resp = await axios.post('https://cors-anywhere.herokuapp.com/http://54.180.145.244:58282/', data)
-            const resp = await axios.post('http://54.180.145.244:58282/', data)
+            const resp = await axios.post('https://beef-flask.herokuapp.com/test', data)
             .then(function (response) {
                 console.log(response);
             })
