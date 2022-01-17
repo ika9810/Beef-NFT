@@ -44,6 +44,9 @@
                 <li class="nav-item active">
                     <a class="nav-link" id="yotube-top-link" href="https://github.com/ika9810">개발자 Github 프로필</a>
                 </li>
+                <li class="nav-item active">
+                    <a class="nav-link" id="yotube-top-link" href="https://baobab.scope.klaytn.com/nft/0xe3a390fdb12dafe2eb37d7829d11a18f37e59424?tabId=nftTransfer">NFT Smart Contract 조회</a>
+                </li>
             </ul>
 
         </div>
@@ -105,7 +108,7 @@
                 <button type="button p-2" class="try-again-btn" onclick="window.location.reload();">
                     <span class="try-again-text">다른 사진으로 재시도</span>
                 </button>
-                <button type="button p-2" class="nft-btn" onclick="window.location.reload();">
+                <button type="button p-2" class="nft-btn" onclick="test();">
                     <span class="try-again-text">NFT 발급하기</span>
                 </button>
             </div>
@@ -376,8 +379,12 @@
             //https://xiubindev.tistory.com/115 참고
             //const resp = await axios.post('https://cors-anywhere.herokuapp.com/http://54.180.145.244:58282/', data)
             const resp = await axios.post('https://beef-flask.herokuapp.com/test', data)
+            //const resp = await axios.post('http://127.0.0.1:5000//test', data)
             .then(function (response) {
                 console.log(response);
+                alert("NFT 발행이 완료되었습니다!");
+                //klaytn baobab scope 사이트로 이동
+                window.location.href = "https://baobab.scope.klaytn.com/tx/" + response["data"]["transactionHash"]+ "?tabId=nftTransfer"
             })
             .catch(function (error) {
                 console.log(error);
