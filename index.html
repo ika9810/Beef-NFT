@@ -392,8 +392,7 @@
                 // NFT 발급시 나타나는 로딩중 요소를 숨긴다. 신기하게 alert 전에 넣어놨지만 소용이 없었다(hide 적용 x) 페이지가 이동하기 전에는 hide가 잘 적용된다
                 $('#nft-loading').hide();
                 console.log(response);
-                alert("NFT 발행이 완료되었습니다!");
-                
+                alert("NFT 발행이 완료되었습니다!" + "https://baobab.scope.klaytn.com/tx/" + response["data"]["transactionHash"]+ "?tabId=nftTransfer");
                 //klaytn baobab scope 사이트로 이동
                 window.location.href = "https://baobab.scope.klaytn.com/tx/" + response["data"]["transactionHash"]+ "?tabId=nftTransfer"
             })
