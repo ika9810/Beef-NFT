@@ -53,7 +53,7 @@
         </div>
     </nav>
     <section class="section">
-        <h1 class="title" onclick="test();">AI 소고기 등급 판별기</h1>
+        <h1 class="title" onclick="test2();">AI 소고기 등급 판별기</h1>
         <h2 class="subtitle">소고기 등급을 판별하고 NFT 인증서를 발급받으세요!</h2>
         <h2 class="sr-only">나의 소고기는 몇등급일까? 나의 소고기 등급 찾기를 해보세요!</h2>
         <h3 class="sr-only">수만장의 소고기 사진 데이터로 학습한 인공지능이 카메라를 통해 나의 소고기 등급을 판별하고 판별된 정보를 NFT에 담아 인증서를 발급해줍니다.</h3>
@@ -302,7 +302,8 @@
                         resultCeleb = "여우상 연예인: 경리(나인뮤지스), 예지(있지), 한혜진(모델), 헤이즈, 지연(티아라)"
                 }
             }
-            var title = "<div class='" + probabilityList[0].className + "-meat-title'>" + resultTitle + "</div>"
+            //grade 값을 가져와 NFT에 저장하기 위해 'meat-grade'라는 id를 부여했다.
+            var title = "<div class='" + probabilityList[0].className + "-meat-title' id='meat-grade'>" + resultTitle + "</div>"
             var explain = "<div class='animal-explain pt-2'>" + resultExplain + "</div>"
             var celeb = "<div class='" + probabilityList[0].className + "-meat-celeb pt-2 pb-2'>" + resultCeleb + "</div>"
             $('.result-message').html(title + explain + celeb);
@@ -361,28 +362,10 @@
                 labelContainer.childNodes[i].innerHTML = label + bar;
             }
         }
-        async function test1(){
-        const img = $('.file-upload-image').attr('src');
-        const grade = $('.twoplus-meat-title').text();
-        var data = {"grade" : grade,"img": img,}
-        console.log(data);
-        const resp = await fetch("http://54.180.145.244:58282/", {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-            "Content-Type": "application/json",
-        // 'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'
-        },
-        body: data
-        })
-        .then((response) => response.json())
-        .then((data) => console.log(data));
-
-        }
         async function test(){
             $('#nft-loading').show();
             const img = $('.file-upload-image').attr('src');
-            const grade = $('.twoplus-meat-title').text();
+            const grade = $('#meat-grade').text();
             const data = {"grade" : grade,"img": img}
             //https://xiubindev.tistory.com/115 참고 CORS 문제 해결 방법
             //const resp = await axios.post('https://cors-anywhere.herokuapp.com/http://54.180.145.244:58282/', data)
@@ -392,9 +375,9 @@
                 // NFT 발급시 나타나는 로딩중 요소를 숨긴다. 신기하게 alert 전에 넣어놨지만 소용이 없었다(hide 적용 x) 페이지가 이동하기 전에는 hide가 잘 적용된다
                 $('#nft-loading').hide();
                 // 단순히 alert(response)만 찍으면 [Object object]형태로만 반환한다. 아래와 같은 형태로 호출해야한다.
-                alert(JSON.stringify(response));
+                //alert(JSON.stringify(response));
                 console.log(response);
-                alert("NFT 발행이 완료되었습니다!" + "https://baobab.scope.klaytn.com/tx/" + response["data"]["transactionHash"]+ "?tabId=nftTransfer");
+                alert("NFT 발행이 완료되었습니다!");
                 //klaytn baobab scope 사이트로 이동
                 window.location.href = "https://baobab.scope.klaytn.com/tx/" + response["data"]["transactionHash"]+ "?tabId=nftTransfer"
             })
@@ -404,14 +387,10 @@
         }
     </script>
     <script>
-                //grade:probabilityList[0].className,
-                //img:$('.file-upload-image').attr('src'),
-
-    </script>
-    <script>
-
-
-
+        function test2(){
+            const grade = $('#meat-grade').text();
+            console.log(grade);
+        }
     </script>
     <script>
         function iosApp() {
@@ -450,7 +429,6 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  -->
-
 </html>
 
 
