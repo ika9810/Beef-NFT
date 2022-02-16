@@ -380,9 +380,9 @@
                 // 단순히 alert(response)만 찍으면 [Object object]형태로만 반환한다. 아래와 같은 형태로 호출해야한다.
                 //alert(JSON.stringify(response));
                 console.log(response);
-                //alert("NFT 발행이 완료되었습니다!");
+                alert("NFT 발행이 완료되었습니다!");
                 //klaytn baobab scope 사이트로 이동
-                //window.location.href = "https://baobab.scope.klaytn.com/tx/" + response["data"]["transactionHash"]+ "?tabId=nftTransfer"
+                window.location.href = "https://baobab.scope.klaytn.com/tx/" + response["data"]["transactionHash"]+ "?tabId=nftTransfer"
             })
             .catch(function (error) {
                 alert(error);
