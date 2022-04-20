@@ -202,7 +202,7 @@
             //teachable machine model 남겨 놓기
             const prediction1 = await model.predict(image, false);
             //Flask 서버에 있는 AI 모델을 통한 소고기 등급 호출 및 결과 리턴 받기
-            const resp = await axios.post('https://vercelfast.vercel.app/predict',data)
+            const resp = await axios.post('https://vercel-fastapi-ai.vercel.app/predict',data)
             .catch(function (error) {
                 alert(error);
             });
