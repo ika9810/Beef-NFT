@@ -112,7 +112,7 @@
                 <button type="button p-2" class="try-again-btn" onclick="window.location.reload();">
                     <span class="try-again-text">다른 사진으로 재시도</span>
                 </button>
-                <button type="button p-2" class="nft-btn" onclick="test();">
+                <button type="button p-2" class="nft-btn" onclick="mint();">
                     <span class="try-again-text">NFT 발급하기</span>
                 </button>
             </div>
@@ -147,7 +147,6 @@
                 init().then(function() {
                     console.log("hello");
                     predict();
-                    $('#loading').hide();
                 });
             } else {
                 removeUpload();
@@ -202,11 +201,9 @@
             //teachable machine model 남겨 놓기
             const prediction1 = await model.predict(image, false);
             //Flask 서버에 있는 AI 모델을 통한 소고기 등급 호출 및 결과 리턴 받기
-            const resp = await axios.post('https://vercel-fastapi-ai.vercel.app/predict',data)
-            .catch(function (error) {
-                alert(error);
-            });
-            const prediction = resp.data;
+            const resp = await axios.post('https://beef-fastapi-ai.herokuapp.com/predict',data).then(function (response) {
+            const prediction = response.data;
+        
             prediction.sort((a, b) => parseFloat(b.probability) - parseFloat(a.probability));
             console.log(prediction[0].className);
             var resultTitle, resultExplain, resultCeleb;
@@ -375,8 +372,13 @@
                 var bar = "<div class='bar-container position-relative container'><div class='" + probabilityList[i].className + "-box'></div><div class='d-flex justify-content-center align-items-center " + probabilityList[i].className + "-bar' style='width: " + barWidth + "'><span class='d-block percent-text'>" + Math.round(probabilityList[i].probability.toFixed(2) * 100) + "%</span></div></div>"
                 labelContainer.childNodes[i].innerHTML = label + bar;
             }
+            })
+            .catch(function (error) {
+                alert(error);
+            });
+            $('#loading').hide();
         }
-        async function test(){
+        async function mint(){
             $('#nft-loading').show();
             const img = $('.file-upload-image').attr('src');
             const grade = $('#meat-grade').text();
@@ -384,7 +386,7 @@
             //https://xiubindev.tistory.com/115 참고 CORS 문제 해결 방법
             //const resp = await axios.post('https://cors-anywhere.herokuapp.com/http://54.180.145.244:58282/', data)
             //const resp = await axios.post('https://beef-flask.herokuapp.com/nftMint', data)
-            const resp = await axios.post('http://127.0.0.1:5000//nftMint', data)
+            const resp = await axios.post('https://vercelfast.vercel.app/nftMint', data)
             .then(function (response) {
                 // NFT 발급시 나타나는 로딩중 요소를 숨긴다. 신기하게 alert 전에 넣어놨지만 소용이 없었다(hide 적용 x) 페이지가 이동하기 전에는 hide가 잘 적용된다
                 $('#nft-loading').hide();
@@ -393,7 +395,7 @@
                 console.log(response);
                 alert("NFT 발행이 완료되었습니다!");
                 //klaytn baobab scope 사이트로 이동
-                alert(response["data"]["transactionHash"])
+                alert("트랜잭션 해쉬값 : " + response["data"]["transactionHash"])
                 window.location.href = "https://baobab.scope.klaytn.com/tx/" + response["data"]["transactionHash"]+ "?tabId=nftTransfer"
             })
             .catch(function (error) {
