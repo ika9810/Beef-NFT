@@ -432,8 +432,14 @@
             const img = $('.file-upload-image').attr('src');
             const grade = $('#meat-grade').text();
             const data = {"grade" : grade,"img": img}
+            const ipfs_data = {"img": img}
 
             ///////////////////메타데이터 설정////////////결국 base64 형태는 매우 크기 때문에 klaytn Api Service 에서 자체적으로 벤을 시킨 것이었다.
+            ////////////////////////ipfs 설정 ///////////////////
+            axios.defaults.withCredentials = true;
+            const resp = await axios.post('https://ipfs-ika9810.vercel.app/predict',ipfs_data,{withCredentials: true}).then(function (response) {
+            cosole.log(response.data)});
+
             let metadata_data = {"metadata": {
                 "description": "Beef NFT는 AI 소고기 등급 판별기를 통해 발행된 NFT로 AI 기반으로 소고기 이미지를 통해 소고기의 등급을 판별한 후 판별된 등급을 NFT에 저장해 인증서를 발급한다.",
                 "external_url": "https://beef.honeyvuitton.com/", 
