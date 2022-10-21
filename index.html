@@ -201,13 +201,15 @@
             //teachable machine model 남겨 놓기
             const prediction1 = await model.predict(image, false);
             //Flask 서버에 있는 AI 모델을 통한 소고기 등급 호출 및 결과 리턴 받기
-            axios.defaults.withCredentials = true;
-            const resp = await axios.post('https://beef-fastapi-ai.herokuapp.com/predict',data,{withCredentials: true}).then(function (response) {
+            const resp = await axios.post('https://beef-fastapi-ai.herokuapp.com/predict',data).then(function (response) {
             const prediction = response.data;
             alert(response.data);
-
             prediction.sort((a, b) => parseFloat(b.probability) - parseFloat(a.probability));
             console.log(prediction[0].className);
+            const fat_data = {"img": img, "grade": prediction[0].className}
+            axios.post('https://beef-fastapi-ai.herokuapp.com/fat',fat_data).then(function (response) {
+                document.getElementById("fat").innerHTML += response.data + "%";
+                console.log(response.data);});
             var resultTitle, resultExplain, resultCeleb;
             var probabilityList = [];
             var zeroList = [];
@@ -286,28 +288,28 @@
                         break;
                     case "twoplus":
                         resultTitle = "1++등급"
-                        resultExplain = "1++등급에 대한 설명이 들어갈 부분 (기준, 가격, 등급의 특징 등등)"
-                        resultCeleb = "1++등급에 대한 기준 요약"
+                        resultExplain = "탄력성과 지방의 질이 매우 좋으며 수분이 알맞게 침출되고 결이 매우 곱고 섬세하며 고기의 광택이 매우 좋은 것"
+                        resultCeleb = "소고기 근내지방도 : "
                         break;
                     case "oneplus":
                         resultTitle = "1+등급"
-                        resultExplain = "1+등급에 대한 설명이 들어갈 부분 (기준, 가격, 등급의 특징 등등)"
-                        resultCeleb = "1+등급에 대한 기준 요약"
+                        resultExplain = "탄력성과 지방의 질이 좋으며 수분이 다소 알맞게 침출되고 결이 곱고 고기의 광택이 좋은 것"
+                        resultCeleb = "소고기 근내지방도 : "
                         break;
                     case "one":
                         resultTitle = "1등급"
-                        resultExplain = "1등급에 대한 설명이 들어갈 부분 (기준, 가격, 등급의 특징 등등)"
-                        resultCeleb = "1등급에 대한 기준 요약"
+                        resultExplain = "탄력성과 지방의 질이 보통이며 수분의 침출정도가 약간 많거나 적고 결과 고기의 광택이 보통인 것"
+                        resultCeleb = "소고기 근내지방도 : "
                         break;
                     case "two":
                         resultTitle = "2등급"
-                        resultExplain = "2등급에 대한 설명이 들어갈 부분 (기준, 가격, 등급의 특징 등등)"
-                        resultCeleb = "2등급에 대한 기준 요약"
+                        resultExplain = "탄력성과 지방의 질이 보통에 비해 좋지 않은 수준이며 고기의 표면이 건조하거나  수분이 많이 침출되고 결과 광택이 보통에 비해 좋지 않은 것"
+                        resultCeleb = "소고기 근내지방도 : "
                         break;
                     case "three":
                         resultTitle = "3등급"
-                        resultExplain = "3등급에 대한 설명이 들어갈 부분 (기준, 가격, 등급의 특징 등등)"
-                        resultCeleb = "3등급에 대한 기준 요약"
+                        resultExplain = "탄력성과 지방의 질이 나쁘며 고기의 표면이 매우 건조하거나 수분이 아주 많이 침출되고 결과 광택이 매우 좋지 않은 것"
+                        resultCeleb = "소고기 근내지방도 : "
                         break;            
                     default:
                         resultTitle = "섹시한 밀당고수 여우상"
@@ -315,10 +317,11 @@
                         resultCeleb = "여우상 연예인: 경리(나인뮤지스), 예지(있지), 한혜진(모델), 헤이즈, 지연(티아라)"
                 }
             }
+            //소고기 설명 reference https://www.law.go.kr/LSW/flDownload.do?flSeq=112276611&flNm=%5B%EB%B3%84%ED%91%9C+1%5D+%EC%86%8C%EB%8F%84%EC%B2%B4+%EC%A1%B0%EC%A7%81%EA%B0%90+%EA%B5%AC%EB%B6%84%EA%B8%B0%EC%A4%80%28%EC%A0%9C5%EC%A1%B0%EC%A0%9C2%ED%95%AD%EC%A0%9C4%ED%98%B8+%EA%B4%80%EB%A0%A8%29
             //grade 값을 가져와 NFT에 저장하기 위해 'meat-grade'라는 id를 부여했다.
             var title = "<div class='" + probabilityList[0].className + "-meat-title' id='meat-grade'>" + resultTitle + "</div>"
             var explain = "<div class='animal-explain pt-2'>" + resultExplain + "</div>"
-            var celeb = "<div class='" + probabilityList[0].className + "-meat-celeb pt-2 pb-2'>" + resultCeleb + "</div>"
+            var celeb = "<div id ='fat' class='" + probabilityList[0].className + "-meat-celeb pt-2 pb-2'>" + resultCeleb + "</div>"
             $('.result-message').html(title + explain + celeb);
             var barWidth;
             for (let i = 0; i < maxPredictions; i++) {
