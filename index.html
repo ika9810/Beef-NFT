@@ -247,12 +247,12 @@
             //teachable machine model 남겨 놓기
             const prediction1 = await model.predict(image, false);
             //Flask 서버에 있는 AI 모델을 통한 소고기 등급 호출 및 결과 리턴 받기
-            const resp = await axios.post('https://beef-fastapi-ai.herokuapp.com/predict_test',data).then(function (response) {
+            const resp = await axios.post('https://beef-fastapi-ai.herokuapp.com/predict',data).then(function (response) {
             const prediction = response.data;
             prediction.sort((a, b) => parseFloat(b.probability) - parseFloat(a.probability));
             console.log(prediction[0].className);
             const fat_data = {"img": img, "grade": prediction[0].className}
-            axios.post('https://beef-fastapi-ai.herokuapp.com/fat_test',fat_data).then(function (response) {
+            axios.post('https://beef-fastapi-ai.herokuapp.com/fat',fat_data).then(function (response) {
                 localStorage.setItem('fat', String(response.data.toFixed(3)) + "%");
                 document.getElementById("fat").innerHTML += String(response.data.toFixed(3)) + "%";
                 console.log(response.data);});
@@ -484,7 +484,7 @@
             const data = {"grade" : grade,"img": img}
             const ipfs_data = {"img": img}
 
-            let fat_ratio = localStorage.getItem("fat")==null ? "13.99%" : localStorage.getItem("fat")
+            let fat_ratio = localStorage.getItem("fat")==null ? "17.08%" : localStorage.getItem("fat")
             ///////////////////메타데이터 설정////////////결국 base64 형태는 매우 크기 때문에 klaytn Api Service 에서 자체적으로 벤을 시킨 것이었다.
             ////////////////////////ipfs 설정 ///////////////////
             // axios.defaults.withCredentials = true;
