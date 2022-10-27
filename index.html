@@ -57,7 +57,7 @@
     </nav>
     <section class="section">
         <h1 class="title" onclick="mint1();">AI 소고기 등급 판별기</h1>
-        <h2 class="subtitle">소고기 등급을 판별하고 NFT 인증서를 발급받으세요!</h2>
+        <h2 class="subtitle" onclick="test();">소고기 등급을 판별하고 NFT 인증서를 발급받으세요!</h2>
         <h2 class="sr-only">나의 소고기는 몇등급일까? 나의 소고기 등급 찾기를 해보세요!</h2>
         <h3 class="sr-only">수만장의 소고기 사진 데이터로 학습한 인공지능이 카메라를 통해 나의 소고기 등급을 판별하고 판별된 정보를 NFT에 담아 인증서를 발급해줍니다.</h3>
         <h4 class="sr-only">본 서비스는 Google의 인공지능 teachable machine 2.0과 GroundX의 Klaytn Network를 활용하였습니다.</h4>
@@ -112,7 +112,7 @@
                 <button type="button p-2" class="try-again-btn" onclick="window.location.reload();">
                     <span class="try-again-text">다른 사진으로 재시도</span>
                 </button>
-                <button type="button p-2" class="nft-btn" onclick="mint();">
+                <button type="button p-2" class="nft-btn" onclick="autoMint();">
                     <span class="try-again-text">NFT 발급하기</span>
                 </button>
             </div>
@@ -249,7 +249,6 @@
             //Flask 서버에 있는 AI 모델을 통한 소고기 등급 호출 및 결과 리턴 받기
             const resp = await axios.post('https://beef-fastapi-ai.herokuapp.com/predict',data).then(function (response) {
             const prediction = response.data;
-            alert(response.data);
             prediction.sort((a, b) => parseFloat(b.probability) - parseFloat(a.probability));
             console.log(prediction[0].className);
             const fat_data = {"img": img, "grade": prediction[0].className}
@@ -427,6 +426,7 @@
             .catch(function (error) {
                 alert(error);
             });
+            setMetadata();
             $('#loading').hide();
         }
         async function mint(){
@@ -460,7 +460,7 @@
             });
             console.log(resp);
         }
-        async function mint1(){
+        async function setMetadata(){
             ////////////////////////현재 날짜 구하기 //////////////////
             var today = new Date();
             var year = today.getFullYear();
@@ -476,8 +476,6 @@
             ////생성 시기 스탬프
             const birth_time = String(today.getTime()/ 1000);
             //////////////////////////////////////////////////
-
-            $('#nft-loading').show();
             const img = $('.file-upload-image').attr('src');
             const grade = $('#meat-grade').text();
             const data = {"grade" : grade,"img": img}
@@ -485,14 +483,14 @@
 
             ///////////////////메타데이터 설정////////////결국 base64 형태는 매우 크기 때문에 klaytn Api Service 에서 자체적으로 벤을 시킨 것이었다.
             ////////////////////////ipfs 설정 ///////////////////
-            axios.defaults.withCredentials = true;
-            const resp = await axios.post('https://ipfs-ika9810.vercel.app/predict',ipfs_data,{withCredentials: true}).then(function (response) {
-            cosole.log(response.data)});
+            // axios.defaults.withCredentials = true;
+            // const resp = await axios.post('https://ipfs-ika9810.vercel.app/predict',ipfs_data,{withCredentials: true}).then(function (response) {
+            // cosole.log(response.data)});
 
             let metadata_data = {"metadata": {
                 "description": "Beef NFT는 AI 소고기 등급 판별기를 통해 발행된 NFT로 AI 기반으로 소고기 이미지를 통해 소고기의 등급을 판별한 후 판별된 등급을 NFT에 저장해 인증서를 발급한다.",
                 "external_url": "https://beef.honeyvuitton.com/", 
-                // "image": img, 
+                "image": "https://raw.githubusercontent.com/ika9810/Beef-NFT/dev/img/beef.jpeg", 
                 "name": "Beef NFT",
             
                 "attributes": [{
@@ -506,7 +504,17 @@
                 },]},
             }
             const metadata_body = JSON.stringify(metadata_data)
-            console.log(metadata_body, typeof(metadata_body));
+            //console.log(metadata_body, typeof(metadata_body));
+            let metadata_options = {
+                method: 'POST',
+                url: 'https://metadata-api.klaytnapi.com/v1/metadata',
+                headers: {
+                'Content-Type': 'application/json',
+                'x-chain-id': '1001',
+                Authorization: 'Basic S0FTS0wyQlMxRDFJMUczREowRTdFUDhEOmptd2hlNkZrcXZLLWxheTUxWHJ5QktJVFJPaXE5MUtyRE9OMjFxR0Q='
+                },
+                data: metadata_body
+            };
             const options = {
                 method: 'POST',
                 headers: {
@@ -516,15 +524,53 @@
                 },
                 body: metadata_body
             };
+            axios.request(metadata_options).then(function (response) {
+                const uri = response.data['uri']
 
-            fetch('https://metadata-api.klaytnapi.com/v1/metadata', options)
-            .then(response => response.json())
-            .then(response => console.log(response))
-            .catch(err => console.error(err));
+                //localStorage에 URI 저장
+                localStorage.setItem('URI', uri);
+
+            }).catch(function (error) {
+                console.error(error);
+            });
+            // fetch('https://metadata-api.klaytnapi.com/v1/metadata', options)
+            // .then(response => response.json())
+            // .then(response => console.log(response))
+            // .catch(err => console.error(err));
+          
+        }
+        async function autoMint(){
+            $('#nft-loading').show();
+            const uri = localStorage.getItem('URI');
+            console.log(uri);
+            let mint_data = {"to" : "0x24b2803c34b11740acd0cc35648e34163c5cba0c","id": (1000).toString(16), "uri": uri}
+            console.log(mint_data);
+            const mint_options = {
+                method: 'POST',
+                url: 'https://kip17-api.klaytnapi.com/v2/contract/0xe3a390fdb12dafe2eb37d7829d11a18f37e59424/token',
+                headers: {
+                'Content-Type': 'application/json',
+                'x-chain-id': '1001',
+                Authorization: 'Basic S0FTS0wyQlMxRDFJMUczREowRTdFUDhEOmptd2hlNkZrcXZLLWxheTUxWHJ5QktJVFJPaXE5MUtyRE9OMjFxR0Q='
+                },
+                data: JSON.stringify(mint_data)
+            };
+            
+            axios.request(mint_options).then(function (response) {
+                $('#nft-loading').hide();
+                alert(JSON.stringify(response));
+                console.log(response.data);
+                console.log(response);
+                alert("NFT 발행이 완료되었습니다!");
+                alert("트랜잭션 해쉬값 : " + response["data"]["transactionHash"])
+                window.location.href = "https://baobab.scope.klaytn.com/tx/" + response["data"]["transactionHash"]+ "?tabId=nftTransfer"
+            }).catch(function (error) {
+                console.error(error);
+            });
         }
     </script>
     <script>
-        function test2(){
+        function test(){
             const grade = $('#meat-grade').text();
             console.log(grade);
         }

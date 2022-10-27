@@ -95,4 +95,44 @@ async function mint1(){
     //     console.error(error);
     // })
 }
+
+
+
+const options = {
+    method: 'POST',
+    url: 'https://metadata-api.klaytnapi.com/v1/metadata',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-chain-id': '1001',
+      Authorization: 'Basic S0FTS0wyQlMxRDFJMUczREowRTdFUDhEOmptd2hlNkZrcXZLLWxheTUxWHJ5QktJVFJPaXE5MUtyRE9OMjFxR0Q='
+    },
+    data: {
+      metadata: {
+        description: 'Beef NFT는 AI 소고기 등급 판별기를 통해 발행된 NFT로 AI 기반으로 소고기 이미지를 통해 소고기의 등급을 판별한 후 판별된 등급을 NFT에 저장해 인증서를 발급한다.'
+      }
+    }
+  };
+  
+  axios.request(options).then(function (response) {
+    console.log(response.data);
+  }).catch(function (error) {
+    console.error(error);
+  });
 /////////////////////////////////////////////////////////////////////KIP-17 API
+
+const mint_options = {
+    method: 'POST',
+    url: 'https://kip17-api.klaytnapi.com/v2/contract/0xe3a390fdb12dafe2eb37d7829d11a18f37e59424/token',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-chain-id': '1001',
+      Authorization: 'Basic S0FTS0wyQlMxRDFJMUczREowRTdFUDhEOmptd2hlNkZrcXZLLWxheTUxWHJ5QktJVFJPaXE5MUtyRE9OMjFxR0Q='
+    },
+    data: '{\n        "to": "0x24b2803c34b11740acd0cc35648e34163c5cba0c",\n        "id": 10000000000,\n        "uri": "uri",\n}'
+  };
+  
+  axios.request(mint_options).then(function (response) {
+    console.log(response.data);
+  }).catch(function (error) {
+    console.error(error);
+  });
