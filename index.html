@@ -247,12 +247,13 @@
             //teachable machine model 남겨 놓기
             const prediction1 = await model.predict(image, false);
             //Flask 서버에 있는 AI 모델을 통한 소고기 등급 호출 및 결과 리턴 받기
-            const resp = await axios.post('https://beef-fastapi-ai.herokuapp.com/predict',data).then(function (response) {
+            const resp = await axios.post('https://beef-fastapi-ai.herokuapp.com/predict_test',data).then(function (response) {
             const prediction = response.data;
             prediction.sort((a, b) => parseFloat(b.probability) - parseFloat(a.probability));
             console.log(prediction[0].className);
             const fat_data = {"img": img, "grade": prediction[0].className}
-            axios.post('https://beef-fastapi-ai.herokuapp.com/fat',fat_data).then(function (response) {
+            axios.post('https://beef-fastapi-ai.herokuapp.com/fat_test',fat_data).then(function (response) {
+                localStorage.setItem('fat', String(response.data.toFixed(3)) + "%");
                 document.getElementById("fat").innerHTML += String(response.data.toFixed(3)) + "%";
                 console.log(response.data);});
             var resultTitle, resultExplain, resultCeleb;
@@ -472,7 +473,9 @@
 
             var dateString = year + month + day + hours + minutes + seconds;
             ////토큰 아이디
-            const id = dateString.toString(16);
+            let token_id = Math.abs(dateString).toString(16);
+            
+            localStorage.setItem('tokenID', token_id);
             ////생성 시기 스탬프
             const birth_time = String(today.getTime()/ 1000);
             //////////////////////////////////////////////////
@@ -481,6 +484,7 @@
             const data = {"grade" : grade,"img": img}
             const ipfs_data = {"img": img}
 
+            let fat_ratio = localStorage.getItem("fat")==null ? "13.99%" : localStorage.getItem("fat")
             ///////////////////메타데이터 설정////////////결국 base64 형태는 매우 크기 때문에 klaytn Api Service 에서 자체적으로 벤을 시킨 것이었다.
             ////////////////////////ipfs 설정 ///////////////////
             // axios.defaults.withCredentials = true;
@@ -489,7 +493,7 @@
 
             let metadata_data = {"metadata": {
                 "description": "Beef NFT는 AI 소고기 등급 판별기를 통해 발행된 NFT로 AI 기반으로 소고기 이미지를 통해 소고기의 등급을 판별한 후 판별된 등급을 NFT에 저장해 인증서를 발급한다.",
-                "external_url": "https://beef.honeyvuitton.com/", 
+                "external_url": "https://beefnft.me/", 
                 "image": "https://raw.githubusercontent.com/ika9810/Beef-NFT/dev/img/beef.jpeg", 
                 "name": "Beef NFT",
             
@@ -501,6 +505,10 @@
                 {
                     "trait_type": "grade",
                     "value": grade
+                },
+                {
+                    "trait_type": "fat",
+                    "value": fat_ratio
                 },]},
             }
             const metadata_body = JSON.stringify(metadata_data)
@@ -514,15 +522,6 @@
                 Authorization: 'Basic S0FTS0wyQlMxRDFJMUczREowRTdFUDhEOmptd2hlNkZrcXZLLWxheTUxWHJ5QktJVFJPaXE5MUtyRE9OMjFxR0Q='
                 },
                 data: metadata_body
-            };
-            const options = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-chain-id': '1001',
-                    Authorization: 'Basic S0FTS0wyQlMxRDFJMUczREowRTdFUDhEOmptd2hlNkZrcXZLLWxheTUxWHJ5QktJVFJPaXE5MUtyRE9OMjFxR0Q='
-                },
-                body: metadata_body
             };
             axios.request(metadata_options).then(function (response) {
                 const uri = response.data['uri']
@@ -542,8 +541,10 @@
         async function autoMint(){
             $('#nft-loading').show();
             const uri = localStorage.getItem('URI');
-            console.log(uri);
-            let mint_data = {"to" : "0x24b2803c34b11740acd0cc35648e34163c5cba0c","id": (1000).toString(16), "uri": uri}
+            const fat = localStorage.getItem("fat");
+            const tokenID = localStorage.getItem("tokenID");
+            console.log(uri,fat,tokenID);
+            let mint_data = {"to" : "0x24b2803c34b11740acd0cc35648e34163c5cba0c","id": '0x' + tokenID, "uri": uri}
             console.log(mint_data);
             const mint_options = {
                 method: 'POST',
@@ -558,7 +559,8 @@
             
             axios.request(mint_options).then(function (response) {
                 $('#nft-loading').hide();
-                alert(JSON.stringify(response));
+                //디버깅을 위한 alert
+                // alert(JSON.stringify(response));
                 console.log(response.data);
                 console.log(response);
                 alert("NFT 발행이 완료되었습니다!");
@@ -573,6 +575,9 @@
         function test(){
             const grade = $('#meat-grade').text();
             console.log(grade);
+            const uri = localStorage.getItem('URI');
+            const fat = localStorage.getItem("fat");
+            console.log(uri,fat);
         }
     </script>
     <script>
